@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Write Post</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #F7F4EF; --ink: #1A1814; --muted: #6B6560;
+      --accent: #C4622D; --accent2: #2D5FA8;
+      --border: #E0DAD2; --card-bg: #FFFFFF; --alt-bg: #F0EBE3;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --sans: 'DM Sans', sans-serif;
+      --success: #2D7A3A; --danger: #B02020;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--sans); background: var(--alt-bg); color: var(--ink); min-height: 100vh; }
+
+    /* LOGIN SCREEN */
+    .login-screen {
+      min-height: 100vh; display: flex;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .login-box {
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: 4px; padding: 48px; max-width: 380px; width: 100%;
+      text-align: center;
+    }
+    .login-logo { font-family: var(--serif); font-size: 2rem; color: var(--accent); margin-bottom: 8px; }
+    .login-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 32px; }
+    .login-box input {
+      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
+      border-radius: 2px; font-family: var(--sans); font-size: 0.95rem;
+      background: var(--card-bg); color: var(--ink); margin-bottom: 12px;
+      outline: none; text-align: center; letter-spacing: 0.1em;
+      transition: border-color 0.2s;
+    }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-error { font-size: 0.82rem; color: var(--danger); margin-bottom: 12px; display: none; }
+
+    /* ADMIN LAYOUT */
+    .admin-screen { display: none; min-height: 100vh; }
+    .admin-header {
+      background: var(--ink); color: var(--cream);
+      padding: 0 32px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .admin-logo { font-family: var(--serif); font-size: 1.2rem; color: var(--accent); }
+    .admin-header-right { display: flex; gap: 12px; align-items: center; }
+    .admin-header a { color: rgba(255,255,255,0.6); font-size: 0.82rem; text-decoration: none; transition: color 0.2s; }
+    .admin-header a:hover { color: #fff; }
+
+    .admin-body {
+      max-width: 1100px; margin: 0 auto;
+      padding: 40px 32px;
+      display: grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: start;
+    }
+
+    /* EDITOR */
+    .editor-panel { background: var(--cream); border: 1px solid var(--border); border-radius: 4px; padding: 36px; }
+    .editor-title-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .editor-title-bar h2 { font-family: var(--serif); font-size: 1.4rem; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .form-group label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 11px 14px; border: 1.5px solid var(--border);
+      border-radius: 2px; font-family: var(--sans); font-size: 0.95rem;
+      background: var(--card-bg); color: var(--ink); outline: none;
+      transition: border-color 0.2s; resize: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { min-height: 320px; line-height: 1.7; }
+    .char-count { font-size: 0.75rem; color: var(--muted); text-align: right; margin-top: 4px; }
+
+    .btn { padding: 11px 24px; border-radius: 2px; border: none; cursor: pointer; font-family: var(--sans); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; transition: all 0.2s; }
+    .btn-save { background: var(--accent); color: #fff; }
+    .btn-save:hover { background: #a8501f; }
+    .btn-clear { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+    .btn-clear:hover { border-color: var(--ink); color: var(--ink); }
+    .btn-danger { background: transparent; border: 1.5px solid #e8b4b4; color: var(--danger); font-size: 0.78rem; padding: 7px 14px; }
+    .btn-danger:hover { background: #fdf0f0; }
+    .btn-export { background: var(--accent2); color: #fff; width: 100%; text-align: center; }
+    .btn-export:hover { background: #244d8a; }
+
+    .form-actions { display: flex; gap: 12px; margin-top: 8px; }
+    .toast {
+      padding: 12px 18px; border-radius: 2px; font-size: 0.875rem;
+      margin-top: 16px; display: none;
+    }
+    .toast.success { background: #eaf5ec; color: var(--success); border: 1px solid #b8ddbf; }
+    .toast.error { background: #fdf0f0; color: var(--danger); border: 1px solid #e8b4b4; }
+
+    /* POSTS LIST PANEL */
+    .posts-panel { display: flex; flex-direction: column; gap: 16px; }
+    .panel-box { background: var(--cream); border: 1px solid var(--border); border-radius: 4px; padding: 24px; }
+    .panel-box h3 { font-family: var(--serif); font-size: 1.1rem; margin-bottom: 16px; }
+
+    .post-item {
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .post-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .post-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .post-item-title { font-size: 0.92rem; font-weight: 500; line-height: 1.3; flex: 1; cursor: pointer; transition: color 0.2s; }
+    .post-item-title:hover { color: var(--accent); }
+    .post-item-meta { display: flex; gap: 8px; align-items: center; }
+    .post-item-cat { font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; padding: 2px 8px; border-radius: 2px; }
+    .cat-research { background: #EAF0F8; color: var(--accent2); }
+    .cat-notes { background: #FFF3EE; color: var(--accent); }
+    .cat-conference { background: #F0F5EA; color: #3A7D2C; }
+    .cat-paper { background: #F5F0FA; color: #6B35A8; }
+    .post-item-date { font-size: 0.75rem; color: var(--muted); }
+    .no-posts { font-size: 0.875rem; color: var(--muted); text-align: center; padding: 20px 0; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-item { text-align: center; padding: 12px; background: var(--alt-bg); border-radius: 2px; }
+    .stat-num { font-family: var(--serif); font-size: 1.6rem; color: var(--accent); }
+    .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+
+    /* Export instructions */
+    .export-steps { font-size: 0.82rem; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+    .export-steps strong { color: var(--ink); }
+
+    @media (max-width: 860px) {
+      .admin-body { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-box">
+      <div class="login-logo">SIKD</div>
+      <p class="login-sub">Admin — Enter password to continue</p>
+      <p class="login-error" id="login-error">Incorrect password. Try again.</p>
+      <input type="password" id="password-input" placeholder="Password" />
+      <button class="btn btn-save" style="width:100%" onclick="checkPassword()">Enter</button>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="admin-screen" id="admin-screen">
+    <div class="admin-header">
+      <span class="admin-logo">SIKD Admin</span>
+      <div class="admin-header-right">
+        <a href="blog.html" target="_blank">View Blog →</a>
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
+    </div>
+
+    <div class="admin-body">
+
+      <!-- EDITOR -->
+      <div class="editor-panel">
+        <div class="editor-title-bar">
+          <h2 id="editor-heading">New Post</h2>
+          <button class="btn btn-clear" onclick="clearForm()">Clear</button>
+        </div>
+
+        <input type="hidden" id="edit-id" value=""/>
+
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="post-title" placeholder="Enter post title..." />
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select id="post-category">
+            <option value="research">Research</option>
+            <option value="notes">Notes</option>
+            <option value="conference">Conference</option>
+            <option value="paper">Paper Summary</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="post-date" />
+        </div>
+
+        <div class="form-group">
+          <label>Content</label>
+          <textarea id="post-content" placeholder="Write your post here...&#10;&#10;You can write freely. Press Enter for new paragraphs." oninput="updateCharCount()"></textarea>
+          <div class="char-count" id="char-count">0 characters</div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-save" onclick="savePost()">Save Post</button>
+        </div>
+        <div class="toast" id="toast"></div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div class="posts-panel">
+
+        <!-- Stats -->
+        <div class="panel-box">
+          <h3>Overview</h3>
+          <div class="stats-grid" id="stats-grid">
+            <div class="stat-item"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
+            <div class="stat-item"><div class="stat-num" id="stat-research">0</div><div class="stat-label">Research</div></div>
+            <div class="stat-item"><div class="stat-num" id="stat-notes">0</div><div class="stat-label">Notes</div></div>
+            <div class="stat-item"><div class="stat-num" id="stat-conference">0</div><div class="stat-label">Conference</div></div>
+          </div>
+        </div>
+
+        <!-- Export -->
+        <div class="panel-box">
+          <h3>Publish to GitHub</h3>
+          <p class="export-steps">
+            After writing posts, export them as <strong>posts.json</strong> and upload that file to your GitHub repository. The blog page will load it automatically.
+          </p>
+          <button class="btn btn-export" onclick="exportPosts()">Export posts.json</button>
+        </div>
+
+        <!-- Posts list -->
+        <div class="panel-box">
+          <h3>Your Posts</h3>
+          <div id="posts-list"><p class="no-posts">No posts yet.</p></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── PASSWORD ──
+    // Change this to your own password!
+    const ADMIN_PASSWORD = 'sikd2024';
+
+    function checkPassword() {
+      const val = document.getElementById('password-input').value;
+      if (val === ADMIN_PASSWORD) {
+        sessionStorage.setItem('admin_auth', '1');
+        showAdmin();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+        document.getElementById('password-input').value = '';
+        document.getElementById('password-input').focus();
+      }
+    }
+    document.getElementById('password-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkPassword();
+    });
+
+    function logout() {
+      sessionStorage.removeItem('admin_auth');
+      location.reload();
+    }
+
+    function showAdmin() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-screen').style.display = 'block';
+      // Set today's date
+      document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
+      loadPostsList();
+    }
+
+    // Auto-login if already authenticated this session
+    if (sessionStorage.getItem('admin_auth') === '1') showAdmin();
+
+    // ── POSTS ──
+    function getPosts() { return JSON.parse(localStorage.getItem('sikd_posts') || '[]'); }
+    function savePosts(posts) { localStorage.setItem('sikd_posts', JSON.stringify(posts)); }
+
+    function savePost() {
+      const title = document.getElementById('post-title').value.trim();
+      const category = document.getElementById('post-category').value;
+      const date = document.getElementById('post-date').value;
+      const content = document.getElementById('post-content').value.trim();
+      const editId = document.getElementById('edit-id').value;
+
+      if (!title) return showToast('Please enter a title.', 'error');
+      if (!content) return showToast('Please write some content.', 'error');
+      if (!date) return showToast('Please select a date.', 'error');
+
+      const posts = getPosts();
+
+      if (editId) {
+        // Update existing
+        const idx = posts.findIndex(p => p.id === editId);
+        if (idx > -1) {
+          posts[idx] = { ...posts[idx], title, category, date, content };
+          savePosts(posts);
+          showToast('Post updated!', 'success');
+          clearForm();
+        }
+      } else {
+        // New post
+        const post = {
+          id: 'post_' + Date.now(),
+          title, category, date, content
+        };
+        posts.unshift(post);
+        savePosts(posts);
+        showToast('Post saved! Remember to export and upload posts.json to GitHub.', 'success');
+        clearForm();
+      }
+      loadPostsList();
+    }
+
+    function editPost(id) {
+      const posts = getPosts();
+      const post = posts.find(p => p.id === id);
+      if (!post) return;
+      document.getElementById('edit-id').value = post.id;
+      document.getElementById('post-title').value = post.title;
+      document.getElementById('post-category').value = post.category;
+      document.getElementById('post-date').value = post.date;
+      document.getElementById('post-content').value = post.content;
+      document.getElementById('editor-heading').textContent = 'Edit Post';
+      updateCharCount();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deletePost(id) {
+      if (!confirm('Delete this post?')) return;
+      const posts = getPosts().filter(p => p.id !== id);
+      savePosts(posts);
+      loadPostsList();
+      showToast('Post deleted.', 'success');
+    }
+
+    function clearForm() {
+      document.getElementById('edit-id').value = '';
+      document.getElementById('post-title').value = '';
+      document.getElementById('post-category').value = 'research';
+      document.getElementById('post-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('post-content').value = '';
+      document.getElementById('editor-heading').textContent = 'New Post';
+      updateCharCount();
+    }
+
+    function loadPostsList() {
+      const posts = getPosts();
+      const list = document.getElementById('posts-list');
+
+      // Stats
+      document.getElementById('stat-total').textContent = posts.length;
+      document.getElementById('stat-research').textContent = posts.filter(p=>p.category==='research').length;
+      document.getElementById('stat-notes').textContent = posts.filter(p=>p.category==='notes').length;
+      document.getElementById('stat-conference').textContent = posts.filter(p=>p.category==='conference').length;
+
+      if (posts.length === 0) {
+        list.innerHTML = '<p class="no-posts">No posts yet. Write your first one!</p>';
+        return;
+      }
+
+      const catLabels = { research:'Research', notes:'Notes', conference:'Conference', paper:'Paper Summary' };
+      list.innerHTML = posts.map(p => `
+        <div class="post-item">
+          <div class="post-item-top">
+            <div class="post-item-title" onclick="editPost('${p.id}')">${p.title}</div>
+            <button class="btn btn-danger" onclick="deletePost('${p.id}')">Delete</button>
+          </div>
+          <div class="post-item-meta">
+            <span class="post-item-cat cat-${p.category}">${catLabels[p.category]||p.category}</span>
+            <span class="post-item-date">${new Date(p.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── EXPORT ──
+    function exportPosts() {
+      const posts = getPosts();
+      if (posts.length === 0) return showToast('No posts to export yet!', 'error');
+      const blob = new Blob([JSON.stringify(posts, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'posts.json';
+      a.click();
+      showToast('posts.json downloaded! Upload it to your GitHub repository.', 'success');
+    }
+
+    // ── UI HELPERS ──
+    function updateCharCount() {
+      const len = document.getElementById('post-content').value.length;
+      document.getElementById('char-count').textContent = len.toLocaleString() + ' characters';
+    }
+
+    function showToast(msg, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast ' + type;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+  </script>
+</body>
+</html>
