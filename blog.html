@@ -121,7 +121,21 @@
     .modal-category { margin-bottom: 16px; }
     .modal-title { font-family: var(--serif); font-size: 2rem; line-height: 1.2; margin-bottom: 12px; }
     .modal-date { font-size: 0.85rem; color: var(--muted); margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
-    .modal-body { font-size: 1rem; line-height: 1.85; color: #2A2824; white-space: pre-wrap; }
+    .modal-body { font-size: 1rem; line-height: 1.85; color: #2A2824; }
+    .modal-body p { margin-bottom: 16px; white-space: pre-wrap; }
+    .modal-body img {
+      max-width: 100%; border-radius: 4px;
+      margin: 20px 0; display: block;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .post-link {
+      color: var(--accent2);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      word-break: break-all;
+      transition: color 0.2s;
+    }
+    .post-link:hover { color: var(--accent); }
 
     /* FOOTER */
     footer { background: var(--ink); color: rgba(255,255,255,0.4); padding: 28px 32px; }
@@ -267,6 +281,30 @@
       renderPosts();
     });
 
+    // ── Render content: images, clickable links, and plain text ──
+    function renderContent(content) {
+      const imageRegex = /^https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i;
+      const urlRegex = /https?:\/\/[^\s]+/g;
+      const lines = content.split('\n');
+      return lines.map(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return '<br/>';
+        // Full line is an image URL
+        if (imageRegex.test(trimmed)) {
+          return `<img src="${trimmed}" alt="Post image" loading="lazy" onerror="this.style.display='none'"/>`;
+        }
+        // Full line is any other URL → clickable link block
+        if (/^https?:\/\/\S+$/.test(trimmed)) {
+          return `<p><a href="${trimmed}" target="_blank" rel="noopener noreferrer" class="post-link">${trimmed}</a></p>`;
+        }
+        // Inline URLs inside text → convert to clickable links
+        const withLinks = trimmed.replace(urlRegex, url => {
+          return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="post-link">${url}</a>`;
+        });
+        return `<p>${withLinks}</p>`;
+      }).join('');
+    }
+
     // ── Modal ──
     function openPost(post) {
       const cat = catStyle[post.category] || catStyle.notes;
@@ -274,7 +312,7 @@
       document.getElementById('modal-category').innerHTML = `<span class="post-category ${cat.cls}">${cat.label}</span>`;
       document.getElementById('modal-title').textContent = post.title;
       document.getElementById('modal-date').textContent = dateStr;
-      document.getElementById('modal-body').textContent = post.content;
+      document.getElementById('modal-body').innerHTML = renderContent(post.content);
       document.getElementById('modal-overlay').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
