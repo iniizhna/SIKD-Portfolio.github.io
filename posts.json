@@ -1,4 +1,4 @@
-[[
+[
   {
     "id": "post_1775806010053",
     "title": "Data Analysis 101",
@@ -13,4 +13,4 @@
     "date": "2026-04-10",
     "content": "Starting to study for a PhD in my early 30s means I have to catch up with any new technology that could help me navigate my own way. I have to familiarize myself with artificial intelligence applications in my field as soon as possible. \nMeanwhile, I have zero programming skills and just start from total scratch. \n\nThis method is my best way of approaching if I have to restart my AI learning journey. \n1. Start with the basic tools.\nHonestly, I started learning programming in MATLAB, and then I slowly started to learn the Python language. And as we know, Python is the main language in AI. \n\n2. Use simple tools :\nI would recommend using Jupyter Notebook or Google Colab if you want to start your first code. These two are quite easy to follow and use. \n\n3. Learn machine learning before learning deep learning. \nData processing, statistical learning, regression, and classification are the main basic features that you need to study or get used to. \n\n4. Practice with a small project. \nI started using Kaggle and saw how other people do the project using a simple dataset. Then try to do my own small project using the simple machine learning mode that I study. It never hurt to start small and develop your skill. \n\nThere are so many AI LLMs like ChatGPT or Claude or even Gemini that can help you explain and simplify things. Read and make sure you understand the things that you look for."
   }
-]]
+]
