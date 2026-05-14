@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog & Notes — Isnaini Djaha</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DDK8HKDE6V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-33BBJTZSKM');
+  </script>
+  <style>
+    :root {
+      --cream: #F7F4EF;
+      --ink: #1A1814;
+      --muted: #6B6560;
+      --accent: #C4622D;
+      --accent2: #2D5FA8;
+      --border: #E0DAD2;
+      --card-bg: #FFFFFF;
+      --alt-bg: #F0EBE3;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --sans: 'DM Sans', sans-serif;
+      --max-w: 900px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--cream); color: var(--ink); line-height: 1.7; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(247,244,239,0.92); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); height: 64px;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 32px;
+      height: 100%; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-family: var(--serif); font-size: 1.3rem; color: var(--accent); text-decoration: none; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 0.85rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--ink); }
+
+    /* HEADER */
+    .page-header {
+      padding: 120px 32px 60px;
+      max-width: var(--max-w); margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-label { font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 12px; }
+    .page-title { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 16px; }
+    .page-title em { font-style: italic; color: var(--accent); }
+    .page-desc { color: var(--muted); font-size: 1rem; max-width: 500px; }
+
+    /* FILTERS */
+    .filters {
+      max-width: var(--max-w); margin: 0 auto;
+      padding: 32px 32px 0;
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 7px 18px; border-radius: 2px;
+      border: 1.5px solid var(--border);
+      background: transparent; cursor: pointer;
+      font-family: var(--sans); font-size: 0.78rem;
+      font-weight: 500; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--muted);
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .filter-btn.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+    /* POSTS */
+    .posts-container { max-width: var(--max-w); margin: 0 auto; padding: 40px 32px 80px; }
+    .empty-state { text-align: center; padding: 80px 0; color: var(--muted); font-size: 1rem; }
+    .empty-state span { font-size: 2.5rem; display: block; margin-bottom: 16px; }
+
+    /* POST CARD */
+    .post-card {
+      border-bottom: 1px solid var(--border);
+      padding: 36px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .post-card:first-child { border-top: 1px solid var(--border); }
+    .post-card:hover .post-title { color: var(--accent); }
+    .post-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .post-category {
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 2px; font-weight: 500;
+    }
+    .cat-research { background: #EAF0F8; color: var(--accent2); }
+    .cat-notes { background: #FFF3EE; color: var(--accent); }
+    .cat-conference { background: #F0F5EA; color: #3A7D2C; }
+    .cat-paper { background: #F5F0FA; color: #6B35A8; }
+    .post-date { font-size: 0.82rem; color: var(--muted); }
+    .post-title { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 10px; line-height: 1.3; transition: color 0.2s; }
+    .post-excerpt { font-size: 0.92rem; color: var(--muted); line-height: 1.7; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .post-read-more { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+
+    /* FULL POST MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(26,24,20,0.6); z-index: 200;
+      backdrop-filter: blur(4px);
+      align-items: flex-start; justify-content: center;
+      padding: 40px 20px; overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--cream); max-width: 720px; width: 100%;
+      border-radius: 4px; padding: 52px;
+      position: relative; margin: auto;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+    .modal-close {
+      position: absolute; top: 20px; right: 24px;
+      background: none; border: none; font-size: 1.5rem;
+      cursor: pointer; color: var(--muted); line-height: 1;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--ink); }
+    .modal-category { margin-bottom: 16px; }
+    .modal-title { font-family: var(--serif); font-size: 2rem; line-height: 1.2; margin-bottom: 12px; }
+    .modal-date { font-size: 0.85rem; color: var(--muted); margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .modal-body { font-size: 1rem; line-height: 1.85; color: #2A2824; }
+    .modal-body p { margin-bottom: 16px; white-space: pre-wrap; }
+    .modal-body img {
+      max-width: 100%; border-radius: 4px;
+      margin: 20px 0; display: block;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .post-link {
+      color: var(--accent2);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      word-break: break-all;
+      transition: color 0.2s;
+    }
+    .post-link:hover { color: var(--accent); }
+
+    /* FOOTER */
+    footer { background: var(--ink); color: rgba(255,255,255,0.4); padding: 28px 32px; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; font-size: 0.8rem; }
+
+    @media (max-width: 640px) {
+      .modal { padding: 32px 24px; }
+      .nav-links { display: none; }
+      .footer-inner { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">SIKD</a>
+      <ul class="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#publications">Publications</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="blog.html" class="active">Blog</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <div class="page-label">Writing</div>
+    <h1 class="page-title">Blog &<br/><em>Notes</em></h1>
+    <p class="page-desc">Research reflections, conference notes, paper summaries, and personal thoughts.</p>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="research">Research</button>
+    <button class="filter-btn" data-filter="notes">Notes</button>
+    <button class="filter-btn" data-filter="conference">Conference</button>
+    <button class="filter-btn" data-filter="paper">Paper Summary</button>
+  </div>
+
+  <div class="posts-container" id="posts-container">
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <span>📝</span>
+      No posts yet in this category.
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close">×</button>
+      <div class="modal-category" id="modal-category"></div>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <div class="modal-date" id="modal-date"></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Isnaini Djaha</span>
+      <span>Built with HTML · CSS · JS</span>
+      <span>National Central University</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── Category styling ──
+    const catStyle = {
+      research:   { label: 'Research',       cls: 'cat-research' },
+      notes:      { label: 'Notes',          cls: 'cat-notes' },
+      conference: { label: 'Conference',     cls: 'cat-conference' },
+      paper:      { label: 'Paper Summary',  cls: 'cat-paper' },
+    };
+
+    // ── Embedded posts (fallback for file:// and offline use) ──
+    const embeddedPosts = [{"id":"post_1776397547367","title":"Understanding the basic principal of Neural Network","category":"notes","date":"2026-04-17","content":"Before we dive into neural networks, we need to understand what the basic principle is. Because somehow in some paper that we read, this term comes often. \nStart with \"Perceptron.\" \nThe perceptron is the simplest form of a neural network, invented by Frank Rosenblatt in 1958. It is a single-layer binary classifier that mimics the single neuron. \nIt simply tells the neuron whether to make a yes or no decision. \n\nHow it works: it takes input (x₁, x₂, ..., xₙ); the input can be any raw data, table data, or image data; then it multiplies them by weights (w₁, w₂, ..., wₙ). Weights show how important the inputs are. Then adds a bias, passing the result through the activation function that acts as the threshold. \n\nSo the math can be as simple as\ny = (input x weight) + bias \n\nIf y>0, the output is 1 (yes)\nIf y < 0, the output is 0 (no).\n\nThis is very simple, but often our data are more complicated than this. Because a perceptron is only limited to solving only OR logic.\nIf we have more neurons that can be stacked together and learn more complex weights and have non-linear relationships, then we have a Multi-Layer Perceptron (MLP). \nMLP, just like a single perceptron, adds more input layers and has hidden layers. The breakthrough of MLP is that it can learn from past mistakes (errors) by backpropagating the error and distributing its weight around the computation in the hidden layer. The threshold (activation function) is also more nonlinear, like sigmoid or ReLU (Rectified Linear Unit), so they can learn the curved decision. \nSo, if the single perceptron is like a person trying to solve a problem, the MLP is like a team of people in an office. That is why it can be called deep learning. \n\nThe Artificial Neural Network (ANN), as we know, is basically just the umbrella term to explain the perceptron or multi-layer perceptron (MLP). Basically, the principal of ANN is the iterative process of\nForward pass - making a prediction\nLoss calculation—measure how wrong the prediction\nBackward pass - adjusting the weights to reduce the error\n\nUsually ANN is used for tabular data. Meanwhile, as we know the image data, we deal with pixel data; it's easier to process using spatial data. A Convolutional Neural Network (CNN) is designed for this. \nA convolution layer is designed to look at the pixels and use a kernel (as the filter) that slides across the image to detect features. \nThe next is pooling: it reduces the dimension of the data. \nThe structure of the CNN starts with several convolution (filter) and pooling layers and ends with a fully connected (MLP) layer to make the final decision. \n\nHow they connect to each other:\nA perceptron is a single neuron; if we combine them together, it makes a \"community\" neuron known as a Multi-Layer Perceptron (MLP). MLP, also known as Artificial Neural Network (ANN), has its flaw, which is that it is very computationally expensive for images because it tries to connect every pixel to every neuron. So CNNs were developed to be more efficient by using local receptive fields. Like we have the smarter way to \"see\" the data before processing it."},{"id":"post_1775806010053","title":"Data Analysis 101","category":"research","date":"2026-04-10","content":"Dealing with data requires several skills. Starting from collecting the data, analyzing it, and finally interpreting the data. The equipment needed to collect the data had to be calibrated first to acquire accurate results. Error analysis still needs to be performed to ensure the data's certainty. The method used to analyze the error, such as root mean square error (RMSE), calculates the percentage of error across all data obtained from the equipment.\nSecond, in data analysis several processes need to proceed before. data preprocessing, including data cleaning, or just simply move or convert the data into the required format. This process can't be underestimated. \nI think this process needed to be done correctly before further analysis. Depending on the software/tools where you want to process the data in a statistical manner, the data format should be prepared accordingly. \nAfter preprocessing, the next step is a simple statistical analysis to determine the pattern of the data.\nMean, median, and standard deviation are the most common variables in this step. Mean usually indicates the range in which the data is most varied. It can show us useful information, but if anything happens, like outliers, this information should be considered again. \nMedian is the middle value of all data. And the most important is standard deviation. This value indicates that quartiles 1, 2, and 3 are also needed for the analysis.\nThe next level of analysis is to get the result if we want to proceed with the analysis based on the goal. \nRegression, hypothesis test, or classification. \nRegression is used to predict something based on the known variable. This prediction can be used as a tool to obtain future results based on the past data. Or else, to get the relationship between variables. \nHypothesis tests (like T-tests) are useful to know the relationship between 2 or more variables, if one variable is statistically significant to another or not. Sometimes it can also be used to compare before and after data. \n\nA classification test is used to classify the data according to the pattern or standard needed, usually with some range of value produced by other standards.\n\nThese data analyses should be performed and visualized in a way that can be understood easily. So, data interpretation and visualization are the next steps after data analysis. \nBar charts, scatter plots, pie charts, line charts, and histograms are the common ways to show data and are easily interpreted. The way the chart showed also affected the result. Color, consistency of the format, font, and another detail in the chart can easily affect the reader. \n\nData analysis can be done using several software programs. The most popular one is Microsoft Excel; the next popular is SPSS (IBM). But I personally prefer Python libraries like Pandas, Matplotlib, or NumPy to do the analysis for me. \nIt all depends on what kind of data you need to analyze and which skills you have. It is easy to start with Mic. Excel is very user-friendly; the tools are easy, and the formula is simple. But the visualization is limited but very advantageous in the preprocessing time. \n\nIn conclusion, data analysis consists of data collection, data preprocessing, data analysis, and data visualization. Each step should be done correctly in the right manner."},{"id":"post_1775803987467","title":"If I'm starting AI as a complete beginner, these are the tools I should use and the best way to approach learning them","category":"notes","date":"2026-04-10","content":"Starting to study for a PhD in my early 30s means I have to catch up with any new technology that could help me navigate my own way. I have to familiarize myself with artificial intelligence applications in my field as soon as possible. \nMeanwhile, I have zero programming skills and just start from total scratch. \n\nThis method is my best way of approaching if I have to restart my AI learning journey. \n1. Start with the basic tools.\nHonestly, I started learning programming in MATLAB, and then I slowly started to learn the Python language. And as we know, Python is the main language in AI. \n\n2. Use simple tools :\nI would recommend using Jupyter Notebook or Google Colab if you want to start your first code. These two are quite easy to follow and use. \n\n3. Learn machine learning before learning deep learning. \nData processing, statistical learning, regression, and classification are the main basic features that you need to study or get used to. \n\n4. Practice with a small project. \nI started using Kaggle and saw how other people do the project using a simple dataset. Then try to do my own small project using the simple machine learning mode that I study. It never hurt to start small and develop your skill. \n\nThere are so many AI LLMs like ChatGPT or Claude or even Gemini that can help you explain and simplify things. Read and make sure you understand the things that you look for."}];
+
+    // ── Load posts from posts.json (GitHub) or fallback to embedded data ──
+    let allPosts = [];
+    let currentFilter = 'all';
+
+    async function loadPosts() {
+      // Always start with embedded posts so the page is never empty
+      allPosts = embeddedPosts.slice();
+
+      // Try fetching posts.json (only works when served from a web server)
+      try {
+        const res = await fetch('posts.json');
+        if (res.ok) {
+          const fetched = await res.json();
+          if (fetched && fetched.length > 0) allPosts = fetched;
+        }
+      } catch(e) {}
+
+      // Merge with any localStorage posts
+      const local = JSON.parse(localStorage.getItem('sikd_posts') || '[]');
+      local.forEach(lp => {
+        if (!allPosts.find(p => p.id === lp.id)) allPosts.push(lp);
+      });
+
+      // Sort newest first
+      allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+      renderPosts();
+    }
+
+    function renderPosts() {
+      const container = document.getElementById('posts-container');
+      const empty = document.getElementById('empty-state');
+      const filtered = currentFilter === 'all'
+        ? allPosts
+        : allPosts.filter(p => p.category === currentFilter);
+
+      // Clear existing cards (keep empty state)
+      container.querySelectorAll('.post-card').forEach(c => c.remove());
+
+      if (filtered.length === 0) {
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      filtered.forEach(post => {
+        const card = document.createElement('div');
+        card.className = 'post-card';
+        const cat = catStyle[post.category] || catStyle.notes;
+        const dateStr = new Date(post.date).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+        card.innerHTML = `
+          <div class="post-meta">
+            <span class="post-category ${cat.cls}">${cat.label}</span>
+            <span class="post-date">${dateStr}</span>
+          </div>
+          <h2 class="post-title">${post.title}</h2>
+          <p class="post-excerpt">${post.content.substring(0, 200)}...</p>
+          <span class="post-read-more">Read more →</span>
+        `;
+        card.addEventListener('click', () => openPost(post));
+        container.appendChild(card);
+      });
+    }
+
+    // ── Filters ──
+    document.getElementById('filters').addEventListener('click', e => {
+      if (!e.target.classList.contains('filter-btn')) return;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      currentFilter = e.target.dataset.filter;
+      renderPosts();
+    });
+
+    // ── Render content: images, clickable links, and plain text ──
+    function renderContent(content) {
+      const imageRegex = /^https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i;
+      const urlRegex = /https?:\/\/[^\s]+/g;
+      const lines = content.split('\n');
+      return lines.map(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return '<br/>';
+        // Full line is an image URL
+        if (imageRegex.test(trimmed)) {
+          return `<img src="${trimmed}" alt="Post image" loading="lazy" onerror="this.style.display='none'"/>`;
+        }
+        // Full line is any other URL → clickable link block
+        if (/^https?:\/\/\S+$/.test(trimmed)) {
+          return `<p><a href="${trimmed}" target="_blank" rel="noopener noreferrer" class="post-link">${trimmed}</a></p>`;
+        }
+        // Inline URLs inside text → convert to clickable links
+        const withLinks = trimmed.replace(urlRegex, url => {
+          return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="post-link">${url}</a>`;
+        });
+        return `<p>${withLinks}</p>`;
+      }).join('');
+    }
+
+    // ── Modal ──
+    function openPost(post) {
+      const cat = catStyle[post.category] || catStyle.notes;
+      const dateStr = new Date(post.date).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+      document.getElementById('modal-category').innerHTML = `<span class="post-category ${cat.cls}">${cat.label}</span>`;
+      document.getElementById('modal-title').textContent = post.title;
+      document.getElementById('modal-date').textContent = dateStr;
+      document.getElementById('modal-body').innerHTML = renderContent(post.content);
+      document.getElementById('modal-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    loadPosts();
+  </script>
+</body>
+</html>
