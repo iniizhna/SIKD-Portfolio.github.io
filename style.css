@@ -389,6 +389,28 @@ ul { list-style: none; }
   margin-bottom: 20px;
   line-height: 1.7;
 }
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.project-link:hover { opacity: 0.8; }
+.project-link--spotify { background: #1DB954; color: #fff; }
+.project-link--apple   { background: #fc3c44; color: #fff; }
+.project-link--web     { background: var(--accent2); color: #fff; }
 
 /* ── CV ── */
 .cv-grid {
